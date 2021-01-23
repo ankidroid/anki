@@ -32,3 +32,4 @@ protobuf!(search);
 protobuf!(stats);
 protobuf!(sync);
 protobuf!(tags);
+protobuf!(sqlite);

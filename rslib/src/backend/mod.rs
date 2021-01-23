@@ -60,6 +60,8 @@ use self::{
     sync::{SyncService, SyncState},
     tags::TagsService,
 };
+use crate::backend::dbproxy::{db_command_proto, DbResult};
+use crate::backend_proto::DbResult as ProtoDbResult;
 use crate::{
     backend::dbproxy::db_command_bytes,
     backend_proto as pb,
@@ -199,5 +201,21 @@ impl Backend {
 
     fn db_command(&self, input: &[u8]) -> Result<Vec<u8>> {
         self.with_col(|col| db_command_bytes(col, input))
+    }
+
+    pub fn db_command_proto(&self, input: &[u8]) -> Result<ProtoDbResult> {
+        self.with_col(|col| db_command_proto(&col.storage, input))
+    }
+
+    pub fn run_db_command_proto(
+        &self,
+        input: &[u8],
+    ) -> std::result::Result<ProtoDbResult, Vec<u8>> {
+        self.db_command_proto(input).map_err(|err| {
+            let backend_err = err.into_protobuf(&self.tr);
+            let mut bytes = Vec::new();
+            backend_err.encode(&mut bytes).unwrap();
+            bytes
+        })
     }
 }
