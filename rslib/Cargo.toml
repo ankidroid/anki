@@ -67,7 +67,6 @@ reqwest = { git="https://github.com/ankitects/reqwest.git", rev="7591444614de02b
     "stream",
     "multipart",
     # the Bazel build scripts separate these out by platform
-    "native-tls",
     "rustls-tls",
     "rustls-tls-webpki-roots",
     "rustls-tls-native-roots",
