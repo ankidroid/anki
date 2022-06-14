@@ -3,6 +3,15 @@
 
 syntax = "proto3";
 
+option java_multiple_files = true;
+
+// "The file's outer class name, "Deckconfig", matches the name of one of the
+// types declared inside it when case is ignored. This can cause compilation
+// issues on Windows / MacOS. Please either rename the type or use the
+// java_outer_classname option to specify a different outer class name for the
+// .proto file to be safe."
+// option java_outer_classname = "DeckConf";
+
 package anki.deckconfig;
 
 import "anki/generic.proto";

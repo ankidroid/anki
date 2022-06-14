@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package anki.sqlite;
+option java_multiple_files = true;
 
-option java_generic_services = true;
+package anki.sqlite;
 
 // We expect in Java: Null, String, Short, Int, Long, Float, Double, Boolean, Blob (unused)
 // We get: DbResult (Null, String, i64, f64, Vec<u8>), which matches SQLite documentation
