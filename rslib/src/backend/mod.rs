@@ -5,6 +5,7 @@
 #![allow(clippy::unnecessary_wraps)]
 
 mod adding;
+mod ankidroid;
 mod card;
 mod cardrendering;
 mod collection;
@@ -41,6 +42,7 @@ use slog::Logger;
 use tokio::runtime::{self, Runtime};
 
 use self::{
+    ankidroid::AnkidroidService,
     card::CardsService,
     cardrendering::CardRenderingService,
     collection::CollectionService,
@@ -60,8 +62,6 @@ use self::{
     sync::{SyncService, SyncState},
     tags::TagsService,
 };
-use crate::backend::dbproxy::{db_command_proto};
-use crate::backend_proto::DbResult as ProtoDbResult;
 use crate::{
     backend::dbproxy::db_command_bytes,
     backend_proto as pb,
@@ -131,6 +131,7 @@ impl Backend {
         pb::ServiceIndex::from_i32(service as i32)
             .ok_or_else(|| AnkiError::invalid_input("invalid service"))
             .and_then(|service| match service {
+                pb::ServiceIndex::Ankidroid => AnkidroidService::run_method(self, method, input),
                 pb::ServiceIndex::Scheduler => SchedulerService::run_method(self, method, input),
                 pb::ServiceIndex::Decks => DecksService::run_method(self, method, input),
                 pb::ServiceIndex::Notes => NotesService::run_method(self, method, input),
@@ -201,21 +202,5 @@ impl Backend {
 
     fn db_command(&self, input: &[u8]) -> Result<Vec<u8>> {
         self.with_col(|col| db_command_bytes(col, input))
-    }
-
-    pub fn db_command_proto(&self, input: &[u8]) -> Result<ProtoDbResult> {
-        self.with_col(|col| db_command_proto(&col.storage, input))
-    }
-
-    pub fn run_db_command_proto(
-        &self,
-        input: &[u8],
-    ) -> std::result::Result<ProtoDbResult, Vec<u8>> {
-        self.db_command_proto(input).map_err(|err| {
-            let backend_err = err.into_protobuf(&self.tr);
-            let mut bytes = Vec::new();
-            backend_err.encode(&mut bytes).unwrap();
-            bytes
-        })
     }
 }

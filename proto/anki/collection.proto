@@ -35,6 +35,8 @@ message OpenCollectionRequest {
   string media_folder_path = 2;
   string media_db_path = 3;
   string log_path = 4;
+
+  bool force_schema11 = 99;
 }
 
 message CloseCollectionRequest {

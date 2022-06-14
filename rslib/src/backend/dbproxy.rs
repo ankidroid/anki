@@ -1,10 +1,6 @@
 // Copyright: Ankitects Pty Ltd and contributors
 // License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
-use crate::backend_proto;
-use crate::backend_proto::{
-    sql_value::Data, DbResult as ProtoDbResult, Row, SqlValue as pb_SqlValue,
-};
 use rusqlite::{
     params_from_iter,
     types::{FromSql, FromSqlError, ToSql, ToSqlOutput, ValueRef},
@@ -12,7 +8,15 @@ use rusqlite::{
 };
 use serde_derive::{Deserialize, Serialize};
 
-use crate::{prelude::*, storage::SqliteStorage};
+use super::ankidroid::backend_id;
+use crate::{
+    backend_proto,
+    backend_proto::{
+        sql_value::Data, DbResponse, DbResult as ProtoDbResult, Row, SqlValue as pb_SqlValue,
+    },
+    prelude::*,
+    storage::SqliteStorage,
+};
 
 #[derive(Deserialize)]
 #[serde(tag = "kind", rename_all = "lowercase")]
@@ -84,10 +88,7 @@ impl From<&SqlValue> for backend_proto::SqlValue {
 impl From<&Vec<SqlValue>> for backend_proto::Row {
     fn from(item: &Vec<SqlValue>) -> Self {
         Row {
-            fields: item
-                .iter()
-                .map(|y| backend_proto::SqlValue::from(y))
-                .collect(),
+            fields: item.iter().map(backend_proto::SqlValue::from).collect(),
         }
     }
 }
@@ -95,7 +96,7 @@ impl From<&Vec<SqlValue>> for backend_proto::Row {
 impl From<&Vec<Vec<SqlValue>>> for backend_proto::DbResult {
     fn from(item: &Vec<Vec<SqlValue>>) -> Self {
         ProtoDbResult {
-            rows: item.iter().map(|x| Row::from(x)).collect(),
+            rows: item.iter().map(Row::from).collect(),
         }
     }
 }
@@ -171,7 +172,17 @@ fn is_dql(sql: &str) -> bool {
     head.starts_with("select")
 }
 
-pub(super) fn db_command_proto(ctx: &SqliteStorage, input: &[u8]) -> Result<ProtoDbResult> {
+pub(crate) fn db_command_proto(col: &Collection, input: &[u8]) -> Result<DbResponse> {
+    let result = db_command_proto_inner(&col.storage, input)?;
+    let trimmed = super::ankidroid::db::trim_and_cache_remaining(
+        backend_id(col),
+        result,
+        super::ankidroid::db::next_sequence_number(),
+    );
+    Ok(trimmed)
+}
+
+fn db_command_proto_inner(ctx: &SqliteStorage, input: &[u8]) -> Result<ProtoDbResult> {
     let req: DbRequest = serde_json::from_slice(input)?;
     let resp = match req {
         DbRequest::Query {

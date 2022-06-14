@@ -13,6 +13,7 @@ macro_rules! protobuf {
     };
 }
 
+protobuf!(ankidroid);
 protobuf!(backend);
 protobuf!(card_rendering);
 protobuf!(cards);
@@ -32,4 +33,3 @@ protobuf!(search);
 protobuf!(stats);
 protobuf!(sync);
 protobuf!(tags);
-protobuf!(sqlite);

@@ -10,7 +10,7 @@ option java_multiple_files = true;
 // issues on Windows / MacOS. Please either rename the type or use the
 // java_outer_classname option to specify a different outer class name for the
 // .proto file to be safe."
-// option java_outer_classname = "DeckConf";
+option java_outer_classname = "DeckConf";
 
 package anki.deckconfig;
 

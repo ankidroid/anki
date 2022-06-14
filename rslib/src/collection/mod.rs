@@ -30,6 +30,7 @@ pub struct CollectionBuilder {
     server: Option<bool>,
     tr: Option<I18n>,
     log: Option<Logger>,
+    force_schema11: Option<bool>,
 }
 
 impl CollectionBuilder {
@@ -51,8 +52,8 @@ impl CollectionBuilder {
         let media_folder = self.media_folder.clone().unwrap_or_default();
         let media_db = self.media_db.clone().unwrap_or_default();
         let log = self.log.clone().unwrap_or_else(crate::log::terminal);
-
-        let storage = SqliteStorage::open_or_create(&col_path, &tr, server)?;
+        let force_schema11 = self.force_schema11.unwrap_or_default();
+        let storage = SqliteStorage::open_or_create(&col_path, &tr, server, force_schema11)?;
         let col = Collection {
             storage,
             col_path,
@@ -91,6 +92,11 @@ impl CollectionBuilder {
     /// Directly set the logger.
     pub fn set_logger(&mut self, log: Logger) -> &mut Self {
         self.log = Some(log);
+        self
+    }
+
+    pub fn set_force_schema11(&mut self, force: bool) -> &mut Self {
+        self.force_schema11 = Some(force);
         self
     }
 
