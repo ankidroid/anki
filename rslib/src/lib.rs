@@ -5,7 +5,7 @@
 
 pub mod adding;
 pub mod backend;
-mod backend_proto;
+pub mod backend_proto;
 pub mod browser_table;
 pub mod card;
 pub mod card_rendering;
