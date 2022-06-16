@@ -62,6 +62,7 @@ message BackendError {
     IMPORT_ERROR = 16;
     DELETED = 17;
     CARD_TYPE_ERROR = 18;
+    FATAL_ERROR = 99;
   }
 
   // localized error description suitable for displaying to the user

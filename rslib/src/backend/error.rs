@@ -9,7 +9,7 @@ use crate::{
 };
 
 impl AnkiError {
-    pub(super) fn into_protobuf(self, tr: &I18n) -> pb::BackendError {
+    pub fn into_protobuf(self, tr: &I18n) -> pb::BackendError {
         let localized = self.localized_description(tr);
         let help_page = self.help_page().map(|page| page as i32);
         let kind = match self {
@@ -39,6 +39,7 @@ impl AnkiError {
             AnkiError::ImportError(_) => Kind::ImportError,
             AnkiError::FileIoError(_) => Kind::IoError,
             AnkiError::MediaCheckRequired => Kind::InvalidInput,
+            AnkiError::FatalError(_) => Kind::FatalError,
         };
 
         pb::BackendError {

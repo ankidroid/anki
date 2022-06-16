@@ -27,4 +27,6 @@ message DbResult {
 message DBResponse {
 	DbResult result = 1;
 	int32 sequenceNumber = 2;
+	int32 rowCount = 3;
+	int64 startIndex = 4;
 }

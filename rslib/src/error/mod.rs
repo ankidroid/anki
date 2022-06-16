@@ -49,6 +49,7 @@ pub enum AnkiError {
     MediaCheckRequired,
     CustomStudyError(CustomStudyError),
     ImportError(ImportError),
+    FatalError(String),
 }
 
 impl Display for AnkiError {
@@ -115,6 +116,7 @@ impl AnkiError {
             AnkiError::FileIoError(err) => {
                 format!("{}: {}", err.path, err.error)
             }
+            AnkiError::FatalError(err) => err.to_owned(),
         }
     }
 

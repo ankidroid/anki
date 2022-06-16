@@ -60,7 +60,7 @@ use self::{
     sync::{SyncService, SyncState},
     tags::TagsService,
 };
-use crate::backend::dbproxy::{db_command_proto, DbResult};
+use crate::backend::dbproxy::{db_command_proto};
 use crate::backend_proto::DbResult as ProtoDbResult;
 use crate::{
     backend::dbproxy::db_command_bytes,
