@@ -1,0 +1,34 @@
+name: Build web/build artifacts from upstream
+on:
+    workflow_dispatch:
+    push:
+    schedule:
+        - cron: "0 0 * * *"
+    pull_request:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        timeout-minutes: 80
+        steps:
+            - uses: actions/checkout@v2
+
+            # todo: cache bazel folder
+
+            - name: Build artifacts
+              run: |
+                  curl -L https://github.com/bazelbuild/bazelisk/releases/download/v1.10.1/bazelisk-linux-amd64 -o ./bazel
+                  chmod +x bazel
+                  export PATH=$(pwd):"$PATH"
+                  ./tools/build-ankidroid-artifacts.sh
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v2
+              with:
+                  name: anki_artifacts
+                  if-no-files-found: error
+                  path: anki_artifacts.zip
