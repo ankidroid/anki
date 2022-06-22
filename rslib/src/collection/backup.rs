@@ -65,7 +65,7 @@ fn has_recent_backup(backup_folder: &Path, recent_mins: u32) -> Result<bool> {
     Ok(read_dir(backup_folder)?
         .filter_map(|res| res.ok())
         .filter_map(|entry| entry.metadata().ok())
-        .filter_map(|meta| meta.created().ok())
+        .filter_map(|meta| meta.modified().ok())
         .filter_map(|time| now.duration_since(time).ok())
         .any(|duration| duration.as_secs() < recent_secs))
 }
